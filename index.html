@@ -1893,19 +1893,40 @@
       const form = document.getElementById('wishes-form');
       const btn = document.getElementById('send-note-btn');
       
+      const guestName = (form.querySelector('[name="guest_name"]')?.value || 'Guest').trim();
+      const guestMessage = (form.querySelector('[name="message"]')?.value || '').trim();
+
       btn.textContent = 'Sending with Love...';
       btn.disabled = true;
 
+      // 1. Submit to Netlify Form Endpoint
       const formData = new FormData(form);
-
       try {
-        await fetch("/", {
+        fetch("/", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: new URLSearchParams(formData).toString()
+        }).catch(() => {});
+      } catch (err) {}
+
+      // 2. Direct Guaranteed Email Dispatch to BOTH vpgkp123@gmail.com AND sourave94949@gmail.com
+      try {
+        await fetch("https://formsubmit.co/ajax/vpgkp123@gmail.com", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            "Guest Name": guestName,
+            "Blessing & Note": guestMessage,
+            "_subject": "💌 Wedding Note from " + guestName + " for Vipul & Pratibha",
+            "_cc": "sourave94949@gmail.com",
+            "_template": "table"
+          })
         });
       } catch (err) {
-        console.log("Logged");
+        console.log("Email dispatch:", err);
       }
 
       // Show smooth in-modal card with heart message
